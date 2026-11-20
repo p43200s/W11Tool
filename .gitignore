@@ -1,0 +1,15 @@
+# 打包產出的單一執行檔（建議透過 GitHub Releases 分發）
+W11Tool_*.bat
+
+# 執行期可能產生的 ODT 檔案
+setup.exe
+configuration*.xml
+
+# 開發輔助匯出檔
+code_dump.txt
+
+# Windows 與編輯器系統暫存檔
+Thumbs.db
+Desktop.ini
+.DS_Store
+.vscode/
