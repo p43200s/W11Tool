@@ -188,7 +188,6 @@ function Invoke-GitHubAssetInstall {
         if (-not (Test-Path $extractDir)) {
             New-Item -Path $extractDir -ItemType Directory -Force | Out-Null
         } else {
-            # 若資料夾內有舊版同前綴執行檔（例如 rufus-4.6p.exe），先清除再放入新版
             if ($curRecord.FileName -and $curRecord.FileName -ne $targetAsset.name) {
                 $oldExe = Join-Path $extractDir $curRecord.FileName
                 if (Test-Path $oldExe) {
@@ -285,20 +284,19 @@ function Show-GitHubDownloadMenu {
         }
     }
 
-    while ($true) {
-        $div   = Get-LineDivider
-        $state = Get-GitHubStateFile -DownloadDir $downloadDir
+    $div = Get-LineDivider
 
-        Show-Header -Subtitle "GitHub 專案管理中心 (目錄: $toolsDir)"
-
-        $hdrCol1 = Format-PadRight " 編號 / 專案名稱" 38
-        $hdrCol2 = Format-PadRight "已下載版本" 16
-        $hdrCol3 = "最新版本 / 狀態"
-        Write-Host "$hdrCol1$hdrCol2$hdrCol3" -ForegroundColor DarkGray
-        Write-Host $div -ForegroundColor DarkCyan
-
-        for ($i = 0; $i -lt $list.Count; $i++) {
-            $item     = $list[$i]
+    Invoke-PagedMenu -Subtitle "GitHub 專案管理中心 (目錄: $toolsDir)" -Items $list -PageSize 6 `
+        -RenderHeaderExtra {
+            $hdrCol1 = Format-PadRight " 編號 / 專案名稱" 38
+            $hdrCol2 = Format-PadRight "已下載版本" 16
+            $hdrCol3 = "最新版本 / 狀態"
+            Write-Host "$hdrCol1$hdrCol2$hdrCol3" -ForegroundColor DarkGray
+            Write-Host $div -ForegroundColor DarkCyan
+        } `
+        -RenderItem {
+            param($item, $idx)
+            $state    = Get-GitHubStateFile -DownloadDir $downloadDir
             $repoName = ($item.Repo -split '/')[-1]
             $folderOk = Test-Path (Join-Path $toolsDir $repoName)
             $rec      = $state[$item.Repo]
@@ -319,7 +317,7 @@ function Show-GitHubDownloadMenu {
                 "未檢查"
             }
 
-            $col1 = Format-PadRight (" [{0,2}] {1}" -f ($i + 1), $item.Name) 38
+            $col1 = Format-PadRight (" [{0,2}] {1}" -f ($idx + 1), $item.Name) 38
             $col2 = Format-PadRight $localVer 16
 
             Write-Host -NoNewline $col1
@@ -341,68 +339,67 @@ function Show-GitHubDownloadMenu {
             if ($item.Desc) {
                 Write-Host ("      └─ {0}" -f $item.Desc) -ForegroundColor DarkGray
             }
-        }
+        } `
+        -RenderFooterCommands {
+            Write-Host $div -ForegroundColor DarkCyan
+            $ghLeft1  = Format-PadRight " [數字] 下載 / 更新 (如: 1,2)" 42
+            $ghRight1 = "[C] 檢查所有專案最新版本"
+            Write-Host "$ghLeft1$ghRight1"
 
-        Write-Host $div -ForegroundColor DarkCyan
-        $ghLeft1  = Format-PadRight " [數字] 下載 / 更新 (如: 1,2)" 42
-        $ghRight1 = "[C] 檢查所有專案最新版本"
-        Write-Host "$ghLeft1$ghRight1"
+            $ghLeft2  = Format-PadRight " [D 數字] 刪除專案 (如: D 1)" 42
+            $ghRight2 = "[O] 開啟資料夾 ($toolsDir)"
+            Write-Host "$ghLeft2$ghRight2"
+        } `
+        -OnCommand {
+            param($raw)
+            $state = Get-GitHubStateFile -DownloadDir $downloadDir
 
-        $ghLeft2  = Format-PadRight " [D 數字] 刪除專案 (如: D 1)" 42
-        $ghRight2 = "[O] 開啟資料夾 ($toolsDir)"
-        Write-Host "$ghLeft2$ghRight2"
+            if ($raw -ieq "O") {
+                if (-not (Test-Path $toolsDir)) { New-Item -Path $toolsDir -ItemType Directory -Force | Out-Null }
+                Start-Process explorer.exe $toolsDir
+                return
+            }
 
-        Show-Footer
-        $raw = (Read-Host "請輸入指令").Trim()
+            if ($raw -ieq "C") {
+                Write-Host ""
+                Write-Status -Level "INFO" -Message "正在向 GitHub API 查詢最新版本..."
+                foreach ($item in $list) {
+                    try {
+                        $rel = Get-GitHubReleaseInfo -Repo $item.Repo -Tag $item.Tag
+                        $latestCache[$item.Repo] = $rel.tag_name
+                        if (-not $state[$item.Repo]) { $state[$item.Repo] = @{} }
+                        $state[$item.Repo].LatestTag = $rel.tag_name
+                        $state[$item.Repo].CheckedAt = (Get-Date).ToString("o")
+                    } catch {
+                        $latestCache[$item.Repo] = "查詢失敗"
+                    }
+                }
+                Save-GitHubStateFile -DownloadDir $downloadDir -State $state
+                return
+            }
 
-        if ($raw -eq "0") { return }
+            if ($raw -match '^[Dd]\s*(.+)$') {
+                $delTargets = Resolve-MultiSelection -InputStr $Matches[1] -MaxCount $list.Count
+                foreach ($idx in $delTargets) {
+                    Remove-GitHubManagedProject -Item $list[$idx - 1] -ToolsDir $toolsDir -DownloadDir $downloadDir -State $state
+                }
+                Wait-UserPause -Message "<< 按 Enter 繼續 >>"
+                return
+            }
 
-        if ($raw -ieq "O") {
-            if (-not (Test-Path $toolsDir)) { New-Item -Path $toolsDir -ItemType Directory -Force | Out-Null }
-            Start-Process explorer.exe $toolsDir
-            continue
-        }
+            $indices = Resolve-MultiSelection -InputStr $raw -MaxCount $list.Count
+            if ($indices.Count -eq 0) { return }
 
-        if ($raw -ieq "C") {
-            Write-Host ""
-            Write-Status -Level "INFO" -Message "正在向 GitHub API 查詢最新版本..."
-            foreach ($item in $list) {
+            foreach ($idx in $indices) {
                 try {
-                    $rel = Get-GitHubReleaseInfo -Repo $item.Repo -Tag $item.Tag
-                    $latestCache[$item.Repo] = $rel.tag_name
-                    if (-not $state[$item.Repo]) { $state[$item.Repo] = @{} }
-                    $state[$item.Repo].LatestTag = $rel.tag_name
-                    $state[$item.Repo].CheckedAt = (Get-Date).ToString("o")
+                    Invoke-GitHubAssetInstall -Item $list[$idx - 1] -ToolsDir $toolsDir -DownloadDir $downloadDir -State $state
+                    if ($state[$list[$idx - 1].Repo]) {
+                        $latestCache[$list[$idx - 1].Repo] = $state[$list[$idx - 1].Repo].Tag
+                    }
                 } catch {
-                    $latestCache[$item.Repo] = "查詢失敗"
+                    Write-Status -Level "ERR" -Message $_.Exception.Message
                 }
             }
-            Save-GitHubStateFile -DownloadDir $downloadDir -State $state
-            continue
+            Wait-UserPause -Message "<< 作業完成，按 Enter 繼續 >>"
         }
-
-        if ($raw -match '^[Dd]\s*(.+)$') {
-            $delTargets = Resolve-MultiSelection -InputStr $Matches[1] -MaxCount $list.Count
-            foreach ($idx in $delTargets) {
-                Remove-GitHubManagedProject -Item $list[$idx - 1] -ToolsDir $toolsDir -DownloadDir $downloadDir -State $state
-            }
-            Wait-UserPause -Message "<< 按 Enter 繼續 >>"
-            continue
-        }
-
-        $indices = Resolve-MultiSelection -InputStr $raw -MaxCount $list.Count
-        if ($indices.Count -eq 0) { continue }
-
-        foreach ($idx in $indices) {
-            try {
-                Invoke-GitHubAssetInstall -Item $list[$idx - 1] -ToolsDir $toolsDir -DownloadDir $downloadDir -State $state
-                if ($state[$list[$idx - 1].Repo]) {
-                    $latestCache[$list[$idx - 1].Repo] = $state[$list[$idx - 1].Repo].Tag
-                }
-            } catch {
-                Write-Status -Level "ERR" -Message $_.Exception.Message
-            }
-        }
-        Wait-UserPause -Message "<< 作業完成，按 Enter 繼續 >>"
-    }
 }

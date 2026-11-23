@@ -39,30 +39,27 @@ function Show-OnlineToolsMenu {
         return
     }
 
-    while ($true) {
-        Show-Header -Subtitle "線上工具庫 (即時拉取執行)"
-        for ($i = 0; $i -lt $list.Count; $i++) {
-            $t = $list[$i]
-            Write-Host (" [{0,2}] {1}" -f ($i + 1), $t.Name) -ForegroundColor White
+    Invoke-PagedMenu -Subtitle "線上工具庫 (即時拉取執行)" -Items $list -PageSize 6 `
+        -RenderItem {
+            param($t, $idx)
+            Write-Host (" [{0,2}] {1}" -f ($idx + 1), $t.Name) -ForegroundColor White
             if ($t.Desc) {
                 $hostDomain = ([uri]$t.Url).Host
                 Write-Host ("      └─ {0} ({1})" -f $t.Desc, $hostDomain) -ForegroundColor DarkGray
             }
-        }
-        Show-Footer
-        $raw = (Read-Host "請輸入編號").Trim()
-        if ($raw -eq "0") { return }
-
-        if ($raw -match '^\d+$') {
-            $idx = [int]$raw
-            if ($idx -ge 1 -and $idx -le $list.Count) {
-                try {
-                    Invoke-OnlineToolItem -Tool $list[$idx - 1]
-                } catch {
-                    Write-Status -Level "ERR" -Message "執行失敗：$($_.Exception.Message)"
+        } `
+        -OnCommand {
+            param($raw)
+            if ($raw -match '^\d+$') {
+                $idx = [int]$raw
+                if ($idx -ge 1 -and $idx -le $list.Count) {
+                    try {
+                        Invoke-OnlineToolItem -Tool $list[$idx - 1]
+                    } catch {
+                        Write-Status -Level "ERR" -Message "執行失敗：$($_.Exception.Message)"
+                    }
+                    Wait-UserPause -Message "<< 按 Enter 繼續 >>"
                 }
-                Wait-UserPause -Message "<< 按 Enter 繼續 >>"
             }
         }
-    }
 }

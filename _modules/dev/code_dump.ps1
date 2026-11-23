@@ -10,7 +10,13 @@ $pipe = "$([char]0x2502)   "
 
 $targetFiles = Get-ChildItem -Path $RootDir -Recurse -File -Include *.bat,*.ps1,*.psm1,*.psd1,*.md |
 Where-Object {
-    $_.Name -ne $outputFile -and $_.Name -notlike "W11Tool_*.bat"
+    if ($_.Name -eq $outputFile) { return $false }
+    if ($_.Name -imatch '^W11Tool_.*\.bat$') { return $false }
+    if ($_.Extension -ieq '.bat') {
+        $firstLine = Get-Content -LiteralPath $_.FullName -TotalCount 1 -Encoding UTF8 -ErrorAction SilentlyContinue
+        if ($firstLine -match '^\s*<#\s*:') { return $false }
+    }
+    return $true
 } | Sort-Object FullName
 
 function Get-TreeLines {

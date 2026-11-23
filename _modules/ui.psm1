@@ -152,6 +152,130 @@ function Invoke-MenuLoop {
     }
 }
 
+# 通用分頁選單引擎 (支援 ←/→ 與 PageUp/PageDown 翻頁，並保留直接輸入指令)
+# 通用分頁選單引擎 (全程接管按鍵輸入：支援隨時 ←/→/PgUp/PgDn 翻頁並保留已輸入文字、Backspace 刪除)
+function Invoke-PagedMenu {
+    param(
+        [string]$Subtitle,
+        [array]$Items,
+        [int]$PageSize = 6,
+        [scriptblock]$RenderHeaderExtra = $null,
+        [scriptblock]$RenderItem,
+        [scriptblock]$RenderFooterCommands = $null,
+        [scriptblock]$OnCommand
+    )
+
+    $page    = 0
+    $inputSb = New-Object System.Text.StringBuilder
+
+    while ($true) {
+        $totalPages = [Math]::Max(1, [Math]::Ceiling($Items.Count / $PageSize))
+        if ($page -ge $totalPages) { $page = $totalPages - 1 }
+        if ($page -lt 0) { $page = 0 }
+
+        $pageHint = if ($totalPages -gt 1) { "$Subtitle  [第 $($page + 1) / $totalPages 頁]" } else { $Subtitle }
+        Show-Header -Subtitle $pageHint
+
+        if ($RenderHeaderExtra) {
+            & $RenderHeaderExtra
+        }
+
+        $startIdx = $page * $PageSize
+        $endIdx   = [Math]::Min($startIdx + $PageSize - 1, $Items.Count - 1)
+
+        for ($i = $startIdx; $i -le $endIdx; $i++) {
+            & $RenderItem $Items[$i] $i
+            # 同頁項目之間固定保留乾淨空行（最後一項不空行）
+            if ($i -lt $endIdx) {
+                Write-Host ""
+            }
+        }
+
+        if ($RenderFooterCommands) {
+            & $RenderFooterCommands
+        }
+
+        $navHint = if ($totalPages -gt 1) {
+            " [ 0] 返回主選單    │    [← / PgUp] 上一頁    [→ / PgDn] 下一頁"
+        } else {
+            " [ 0] 返回主選單"
+        }
+        Show-Footer -HintText $navHint
+
+        # 印出提示詞與目前已輸入的緩衝區內容（翻頁後會自動保留已打的字）
+        Write-Host -NoNewline ("請輸入指令: " + $inputSb.ToString())
+
+        # 內層逐鍵讀取迴圈
+        while ($true) {
+            $keyInfo = [Console]::ReadKey($true)
+
+            # 1. 隨時攔截翻頁鍵（即使已經輸入一半的數字也能直接翻頁，且不產生亂碼）
+            if ($keyInfo.Key -eq [ConsoleKey]::PageDown -or $keyInfo.Key -eq [ConsoleKey]::RightArrow) {
+                if ($totalPages -gt 1) {
+                    $page = ($page + 1) % $totalPages
+                    break
+                }
+                continue
+            }
+            if ($keyInfo.Key -eq [ConsoleKey]::PageUp -or $keyInfo.Key -eq [ConsoleKey]::LeftArrow) {
+                if ($totalPages -gt 1) {
+                    $page = ($page - 1 + $totalPages) % $totalPages
+                    break
+                }
+                continue
+            }
+
+            # 2. 忽略上下方向鍵與功能鍵，防止終端機印出異常控制字元
+            if ($keyInfo.Key -eq [ConsoleKey]::UpArrow -or $keyInfo.Key -eq [ConsoleKey]::DownArrow) {
+                continue
+            }
+
+            # 3. Esc：若有輸入文字則先清空輸入框；若輸入框已空則直接返回主選單
+            if ($keyInfo.Key -eq [ConsoleKey]::Escape) {
+                if ($inputSb.Length -gt 0) {
+                    $clearWidth = Get-VisualWidth -Text $inputSb.ToString()
+                    Write-Host -NoNewline (("`b" * $clearWidth) + (" " * $clearWidth) + ("`b" * $clearWidth))
+                    [void]$inputSb.Clear()
+                    continue
+                } else {
+                    return
+                }
+            }
+
+            # 4. Backspace：精準刪除最後一個字元（相容全形/中文雙倍寬度退格）
+            if ($keyInfo.Key -eq [ConsoleKey]::Backspace) {
+                if ($inputSb.Length -gt 0) {
+                    $lastChar  = $inputSb[$inputSb.Length - 1].ToString()
+                    $charWidth = Get-VisualWidth -Text $lastChar
+                    [void]$inputSb.Remove($inputSb.Length - 1, 1)
+                    Write-Host -NoNewline (("`b" * $charWidth) + (" " * $charWidth) + ("`b" * $charWidth))
+                }
+                continue
+            }
+
+            # 5. Enter：送出目前緩衝區的完整指令
+            if ($keyInfo.Key -eq [ConsoleKey]::Enter) {
+                Write-Host ""
+                $raw = $inputSb.ToString().Trim()
+                [void]$inputSb.Clear()
+
+                if ($raw -eq "0") { return }
+                if ([string]::IsNullOrWhiteSpace($raw)) { break }
+
+                $actionResult = & $OnCommand $raw
+                if ($actionResult -eq "EXIT") { return }
+                break
+            }
+
+            # 6. 一般可列印字元（數字、英文、逗號、空白等）：加入緩衝區並顯示在畫面上
+            if (-not [char]::IsControl($keyInfo.KeyChar)) {
+                [void]$inputSb.Append($keyInfo.KeyChar)
+                Write-Host -NoNewline $keyInfo.KeyChar
+            }
+        }
+    }
+}
+
 function Wait-UserPause {
     param([string]$Message = "<< 按 Enter 繼續 >>")
     Write-Host ""
@@ -162,4 +286,4 @@ function Wait-UserPause {
     }
 }
 
-Export-ModuleMember -Function Get-LineDivider, Get-VisualWidth, Format-PadRight, Write-Status, Show-Header, Show-Footer, Show-TwoColumnGrid, Invoke-MenuLoop, Wait-UserPause
+Export-ModuleMember -Function Get-LineDivider, Get-VisualWidth, Format-PadRight, Write-Status, Show-Header, Show-Footer, Show-TwoColumnGrid, Invoke-MenuLoop, Invoke-PagedMenu, Wait-UserPause

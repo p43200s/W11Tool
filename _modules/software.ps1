@@ -34,14 +34,15 @@
         $cmdRight2 = "[F] 重新掃描已安裝狀態"
         Write-Host "$cmdLeft2$cmdRight2"
 
+        Write-Host " [N] NVCleanstall 中文說明對照表"
+
         Show-Footer
         $raw = (Read-Host "請輸入指令").Trim()
 
         if ($raw -eq "0") { return }
 
-        if ($raw -ieq "F") {
-            Write-Status -Level "INFO" -Message "重新掃描本機已安裝清單..."
-            $installedSet = Get-InstalledWinGetIds -ForceRefresh
+        if ($raw -ieq "N") {
+            Show-NVCleanstallGuide
             continue
         }
 

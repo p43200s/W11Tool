@@ -2,18 +2,18 @@
 $ErrorActionPreference = "Stop"
 
 $modulesDir = Join-Path $RootDir "_modules"
-$folderName = Split-Path $RootDir -Leaf
-$autoVer    = if ($folderName -match '([\d\.]+)$') { $Matches[1] } else { "0.03" }
+$configPath = Join-Path $modulesDir "config.psd1"
+$configRaw  = Get-Content $configPath -Raw -Encoding UTF8
+$configData = Import-PowerShellDataFile -Path $configPath
 
-$verInput   = (Read-Host "`n請輸入打包版本號 (直接按 Enter 自動帶入目錄版本 $autoVer)").Trim()
-$verTag     = if ($verInput) { $verInput } else { $autoVer }
+$autoVer  = $configData.DefaultVer
+$verInput = (Read-Host "`n請輸入打包版本號 (直接按 Enter 使用設定檔版本 $autoVer)").Trim()
+$verTag   = if ($verInput) { $verInput } else { $autoVer }
 
 $outName = "W11Tool_$verTag.bat"
 $outPath = Join-Path $RootDir $outName
 
 Write-Host "[INFO] 正在動態組裝 Polyglot 單一執行檔 ($outName)..." -ForegroundColor Cyan
-
-$configRaw = Get-Content (Join-Path $modulesDir "config.psd1") -Raw -Encoding UTF8
 
 # 依相依順序動態掃描並封裝所有 .psm1 模組
 $psmOrdered = @("utils.psm1", "ui.psm1")
@@ -65,11 +65,11 @@ foreach ($scr in $featureScripts) {
 
 $menuRaw = Get-Content (Join-Path $modulesDir "menu.ps1") -Raw -Encoding UTF8
 $menuRaw = $menuRaw -replace '(?m)^\s*Import-Module.*\.psm1.*$', ''
-$menuRaw = $menuRaw -replace '(?s)Get-ChildItem\s+-Path\s+\$PSScriptRoot.*?\}', ''
+$menuRaw = $menuRaw -replace '(?s)Get-ChildItem\s+-Path\s+\$PSScriptRoot.*?ForEach-Object\s*\{.*?\}', ''
 [void]$sb.AppendLine($menuRaw)
 
-$utf8WithBom = New-Object System.Text.UTF8Encoding $true
-[System.IO.File]::WriteAllText($outPath, $sb.ToString(), $utf8WithBom)
+$utf8NoBom = New-Object System.Text.UTF8Encoding $false
+[System.IO.File]::WriteAllText($outPath, $sb.ToString(), $utf8NoBom)
 
 $sizeKB = [Math]::Round((Get-Item $outPath).Length / 1KB, 1)
 Write-Host "[SUCCESS] 打包完成：$outName ($sizeKB KB)" -ForegroundColor Green

@@ -1,7 +1,7 @@
 ﻿@{
     # 專案標題與預設版本
-    AppName    = "Win11 裝機工具"
-    DefaultVer = "0.03"
+    AppName    = "Windows 11 裝機工具箱"
+    DefaultVer = "0.3.1"
 
     # 線上工具庫 (Type 支援: irm_iex / web)
     OnlineTools = @(
@@ -15,7 +15,7 @@
             Name = "Win11Debloat"
             Url  = "https://debloat.raphi.re/"
             Type = "irm_iex"
-            Desc = "移除內建預載軟體、停用遙測與廣告"
+            Desc = "移除內建預載軟體、停用遙測、廣告與基礎 AI 功能"
         }
         @{
             Name = "Chris Titus Tech's Windows Utility"
@@ -89,6 +89,27 @@
     # GitHub Releases 工具下載清單
     GitHubList = @(
         @{
+            Name    = "balenaEtcher"
+            Repo    = "balena-io/etcher"
+            Tag     = ""
+            Pattern = "balenaEtcher-*-x64.exe"
+            Desc    = "跨平台映像檔寫入 USB / SD 卡工具 (免安裝單一執行檔)"
+        }
+        @{
+            Name    = "Ventoy"
+            Repo    = "ventoy/Ventoy"
+            Tag     = ""
+            Pattern = "ventoy-*-windows.zip"
+            Desc    = "免重複格式化多重開機 USB 隨身碟製作工具"
+        }
+        @{
+            Name    = "Rufus"
+            Repo    = "pbatard/rufus"
+            Tag     = ""
+            Pattern = "rufus-*p.exe"
+            Desc    = "輕量級可開機 USB 隨身碟製作工具 (Portable 版)"
+        }
+        @{
             Name    = "ConvertZZ"
             Repo    = "flier268/ConvertZZ"
             Tag     = ""
@@ -100,14 +121,14 @@
             Repo    = "xupefei/Locale-Emulator"
             Tag     = ""
             Pattern = "Locale.Emulator.*.zip"
-            Desc    = ""
+            Desc    = "模擬系統語系與時區執行日文/非 Unicode 軟體"
         }
         @{
-            Name    = "Rufus"
-            Repo    = "pbatard/rufus"
+            Name    = "LunaTranslator"
+            Repo    = "HIllya51/LunaTranslator"
             Tag     = ""
-            Pattern = "rufus-*p.exe"
-            Desc    = "可開機 USB 隨身碟製作工具"
+            Pattern = "LunaTranslator.zip"
+            Desc    = "Galgame/視覺小說 Hook、OCR 與即時翻譯器"
         }
         @{
             Name    = "WindowTranslator"
@@ -115,6 +136,13 @@
             Tag     = ""
             Pattern = "*win-x64*.zip"
             Desc    = "即時螢幕視窗 OCR 擷取與多語言翻譯工具"
+        }
+        @{
+            Name    = "Magpie"
+            Repo    = "Blinue/Magpie"
+            Tag     = ""
+            Pattern = "Magpie-v*-x64.zip"
+            Desc    = "視窗化遊戲與軟體通用無損縮放/補幀放大工具"
         }
     )
 }
