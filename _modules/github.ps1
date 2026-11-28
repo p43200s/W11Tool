@@ -296,7 +296,7 @@ function Show-GitHubDownloadMenu {
 
     $div = Get-LineDivider
 
-    Invoke-PagedMenu -Subtitle "GitHub 專案管理中心 (目錄: $toolsDir)" -Items $list -PageSize 6 `
+    Invoke-PagedMenu -Subtitle "GitHub 管理中心" -Items $list -PageSize 6 `
         -RenderHeaderExtra {
             $hdrCol1 = Format-PadRight " 編號 / 專案名稱" 38
             $hdrCol2 = Format-PadRight "已下載版本" 16

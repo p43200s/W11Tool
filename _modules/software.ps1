@@ -3,79 +3,31 @@
     if (-not (Test-InternetConnection)) { return }
     if (-not (Confirm-WinGetReady)) { return }
 
-    $cfg     = Get-WinToolConfig -RootDir $RootDir
-    $list    = $cfg.SoftwareList
-    $presets = $cfg.SoftwarePresets
+    $cfg  = Get-WinToolConfig -RootDir $RootDir
+    $list = @($cfg.SoftwareList)
+
+    if ($list.Count -eq 0) {
+        Write-Status -Level "WARN" -Message "config.psd1 中尚未設定任何 SoftwareList 項目。"
+        Wait-UserPause -Message "<< 按 Enter 繼續 >>"
+        return
+    }
 
     Write-Status -Level "INFO" -Message "正在比對本機已安裝軟體狀態..."
     $installedSet = Get-InstalledWinGetIds
 
-    while ($true) {
-        $div = Get-LineDivider
-        Show-Header -Subtitle "常用與內建軟體安裝"
-
-        Show-TwoColumnGrid -Items $list `
-            -FormatLabel { param($item) "[$($item.Cat)] $($item.Name)" } `
-            -GetTag { param($item) if ($installedSet.Contains($item.Id)) { "[已裝]" } else { "" } }
-
-        Write-Host $div -ForegroundColor DarkCyan
-        if ($presets -and $presets.Count -gt 0) {
-            foreach ($p in $presets) {
-                Write-Host (" [{0}] {1}" -f $p.Key, $p.Name) -ForegroundColor Cyan
+    $invokeInstallIndices = {
+        param([int[]]$Indices)
+        $validIndices = [System.Collections.Generic.List[int]]::new()
+        foreach ($n in @($Indices)) {
+            if ($n -ge 1 -and $n -le $list.Count -and -not $validIndices.Contains($n)) {
+                [void]$validIndices.Add($n)
             }
-            Write-Host $div -ForegroundColor DarkCyan
         }
+        if ($validIndices.Count -eq 0) { return }
 
-        $cmdLeft1  = Format-PadRight " [數字] 多選安裝 (如: 1,3,5-8)" 42
-        $cmdRight1 = "[組合] 套用快捷包 (如: P1)"
-        Write-Host "$cmdLeft1$cmdRight1"
-
-        $cmdLeft2  = Format-PadRight " [A] 全選未安裝項目" 42
-        $cmdRight2 = "[F] 重新掃描已安裝狀態"
-        Write-Host "$cmdLeft2$cmdRight2"
-
-        Write-Host " [N] NVCleanstall 中文說明對照表"
-
-        Show-Footer
-        $raw = (Read-Host "請輸入指令").Trim()
-
-        if ($raw -eq "0") { return }
-
-        if ($raw -ieq "N") {
-            Show-NVCleanstallGuide
-            continue
-        }
-
-        $targetIndices = [System.Collections.Generic.List[int]]::new()
-
-        if ($raw -ieq "A") {
-            for ($i = 0; $i -lt $list.Count; $i++) {
-                if (-not $installedSet.Contains($list[$i].Id)) {
-                    $targetIndices.Add($i + 1)
-                }
-            }
-            if ($targetIndices.Count -eq 0) {
-                Write-Status -Level "OK" -Message "清單中所有軟體皆已安裝！"
-                Wait-UserPause -Message "<< 按 Enter 返回主選單 >>"
-                continue
-            }
-        } elseif ($presets -and ($presets.Key -contains $raw.ToUpper())) {
-            $chosenPreset = $presets | Where-Object { $_.Key -ieq $raw } | Select-Object -First 1
-            for ($i = 0; $i -lt $list.Count; $i++) {
-                if ($chosenPreset.Ids -contains $list[$i].Id) {
-                    $targetIndices.Add($i + 1)
-                }
-            }
-        } else {
-            $parsed = Resolve-MultiSelection -InputStr $raw -MaxCount $list.Count
-            foreach ($n in $parsed) { $targetIndices.Add($n) }
-        }
-
-        if ($targetIndices.Count -eq 0) { continue }
-
-        $total = $targetIndices.Count
+        $total = $validIndices.Count
         $step  = 0
-        foreach ($idx in $targetIndices) {
+        foreach ($idx in $validIndices) {
             $step++
             $app = $list[$idx - 1]
 
@@ -95,6 +47,89 @@
         }
         Wait-UserPause -Message "<< 批次作業完成，按 Enter 繼續 >>"
     }
+
+    $pageSize = 40
+    $pageRows = @()
+    for ($start = 0; $start -lt $list.Count; $start += $pageSize) {
+        $end = [Math]::Min($start + $pageSize - 1, $list.Count - 1)
+        $pageRows += ,@($start..$end)
+    }
+
+    $div      = Get-LineDivider
+    $colWidth = [Math]::Floor(($global:WinToolWidth - 3) / 2)
+
+    Invoke-PagedMenu -Subtitle "常用與內建軟體安裝" -Items $pageRows -PageSize 1 -Compact `
+        -RenderItem {
+            param($sliceIndices, $pageIdx)
+            $slice = @($sliceIndices | ForEach-Object {
+                [PSCustomObject]@{
+                    GlobalIdx = $_
+                    Item      = $list[$_]
+                }
+            })
+            $half = [Math]::Ceiling($slice.Count / 2)
+
+            for ($r = 0; $r -lt $half; $r++) {
+                $leftEntry = $slice[$r]
+                $leftNum   = $leftEntry.GlobalIdx + 1
+                $leftBase  = " [{0,2}] [{1}] {2}" -f $leftNum, $leftEntry.Item.Cat, $leftEntry.Item.Name
+                $leftDone  = $installedSet.Contains($leftEntry.Item.Id)
+                $leftTag   = if ($leftDone) { "[已裝]" } else { "" }
+
+                if ($leftDone) {
+                    $lSpace = [Math]::Max(1, $colWidth - (Get-VisualWidth $leftBase) - (Get-VisualWidth $leftTag))
+                    Write-Host -NoNewline $leftBase
+                    Write-Host -NoNewline (" " * $lSpace)
+                    Write-Host -NoNewline $leftTag -ForegroundColor Green
+                } else {
+                    Write-Host -NoNewline (Format-PadRight $leftBase $colWidth)
+                }
+
+                $rightPos = $r + $half
+                if ($rightPos -lt $slice.Count) {
+                    Write-Host -NoNewline " │ " -ForegroundColor DarkGray
+                    $rightEntry = $slice[$rightPos]
+                    $rightNum   = $rightEntry.GlobalIdx + 1
+                    $rightBase  = " [{0,2}] [{1}] {2}" -f $rightNum, $rightEntry.Item.Cat, $rightEntry.Item.Name
+                    $rightDone  = $installedSet.Contains($rightEntry.Item.Id)
+                    $rightTag   = if ($rightDone) { "[已裝]" } else { "" }
+
+                    if ($rightDone) {
+                        $rSpace = [Math]::Max(1, $colWidth - (Get-VisualWidth $rightBase) - (Get-VisualWidth $rightTag))
+                        Write-Host -NoNewline $rightBase
+                        Write-Host -NoNewline (" " * $rSpace)
+                        Write-Host $rightTag -ForegroundColor Green
+                    } else {
+                        Write-Host $rightBase
+                    }
+                } else {
+                    Write-Host ""
+                }
+            }
+        } `
+        -RenderFooterCommands {
+            Write-Host $div -ForegroundColor DarkCyan
+            Write-Host " [數字] 多選安裝 (如: 1,3,5-8)  │  [F] 重新掃描狀態  │  [N] NVCleanstall 說明對照表"
+        } `
+        -OnCommand {
+            param($raw)
+            if ($raw -ieq "N") {
+                Show-NVCleanstallGuide
+                return
+            }
+
+            if ($raw -ieq "F") {
+                Write-Host ""
+                Write-Status -Level "INFO" -Message "正在重新掃描本機已安裝軟體狀態..."
+                $installedSet = Get-InstalledWinGetIds -ForceRefresh
+                return
+            }
+
+            $parsed = @(Resolve-MultiSelection -InputStr $raw -MaxCount $list.Count)
+            if ($parsed.Count -gt 0) {
+                & $invokeInstallIndices -Indices $parsed
+            }
+        }
 }
 
 function Invoke-SystemSoftwareUpdate {

@@ -1,5 +1,24 @@
 # 更新日誌
 
+## [0.3.3] - 2026-11-28
+
+### 新增
+
+- **通用分頁選單緊湊模式 (`_modules/ui.psm1`)**：為 `Invoke-PagedMenu` 新增 `-Compact` 參數，支援隱藏同頁項目之間的額外空行，提升長清單與多欄選單的畫面密度。
+- **擴充常用裝機軟體與執行期元件清單 (`_modules/config.psd1`)**：新增 `VC++ 2015-2022 (x64 / x86)`、`.NET 8 / 9 / 10 Desktop Runtime`、`Java Runtime Environment`、`Microsoft PowerToys`、`AnyDesk`、`qBittorrent`、`LINE`、`Discord`、`PotPlayer` 與 `K-Lite Codec Pack Standard` 等常用裝機項目。
+
+### 調整
+
+- **常用與內建軟體安裝改採雙欄分頁與精簡介面 (`_modules/software.ps1` / `_modules/config.psd1`)**：
+  - 整合 `Invoke-PagedMenu -Compact` 實作雙欄分頁瀏覽（預設每頁 34 筆、左右各 17 列），並移除清單項目後方多餘的來源標籤字樣。
+  - 移除 `SoftwarePresets` 軟體快捷組合與 `[A]` 全選未安裝項目功能，將底部操作列精簡為單行以釋放更多清單顯示空間。
+  - 補齊 `[F]` 重新掃描本機已安裝軟體狀態的指令處理邏輯。
+- **加速單一封裝檔啟動速度 (`_modules/dev/build.ps1`)**：移除 Polyglot 檔頭每次啟動時檢查 `Zone.Identifier` 並呼叫 PowerShell 執行 `Unblock-File` 的流程，減少老舊電腦啟動時的額外延遲。
+
+### 修復
+
+- **多選安裝與已安裝狀態集合固定大小異常 (`_modules/software.ps1` / `_modules/utils.psm1`)**：強化 `Resolve-MultiSelection` 回傳型別為 `[int[]]` 並以可變集合 `List[int]` 管理目標索引，修復批次多選安裝時觸發 `Exception calling "Add" with "1" argument(s): "Collection was of a fixed size."` 的錯誤。
+
 ## [0.3.2] - 2026-11-28
 
 ### 新增
@@ -12,7 +31,6 @@
 ### 調整
 
 - **線上工具即時執行流程 (_modules/online.ps1)**：移除 Invoke-OnlineToolItem 中執行腳本前的二次確認提示，選取項目後直接下載並執行。
-
 
 ## [0.3.1] - 2026-11-23
 

@@ -90,7 +90,11 @@ function Resolve-MultiSelection {
         [string]$InputStr,
         [int]$MaxCount
     )
-    $selected = [System.Collections.Generic.List[int]]::new()
+    [System.Collections.Generic.List[int]]$selected = [System.Collections.Generic.List[int]]::new()
+    if ([string]::IsNullOrWhiteSpace($InputStr) -or $MaxCount -le 0) {
+        return [int[]]@()
+    }
+
     $tokens = $InputStr -split '[,\s]+' | Where-Object { $_ -ne "" }
 
     foreach ($t in $tokens) {
@@ -100,18 +104,18 @@ function Resolve-MultiSelection {
             if ($start -le $end) {
                 for ($n = $start; $n -le $end; $n++) {
                     if ($n -ge 1 -and $n -le $MaxCount -and -not $selected.Contains($n)) {
-                        $selected.Add($n)
+                        [void]$selected.Add($n)
                     }
                 }
             }
         } elseif ($t -match '^\d+$') {
             $n = [int]$t
             if ($n -ge 1 -and $n -le $MaxCount -and -not $selected.Contains($n)) {
-                $selected.Add($n)
+                [void]$selected.Add($n)
             }
         }
     }
-    return $selected.ToArray()
+    return [int[]]$selected.ToArray()
 }
 
 function Test-InternetConnection {

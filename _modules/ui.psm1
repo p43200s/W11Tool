@@ -159,6 +159,7 @@ function Invoke-PagedMenu {
         [string]$Subtitle,
         [array]$Items,
         [int]$PageSize = 6,
+        [switch]$Compact,
         [scriptblock]$RenderHeaderExtra = $null,
         [scriptblock]$RenderItem,
         [scriptblock]$RenderFooterCommands = $null,
@@ -185,8 +186,7 @@ function Invoke-PagedMenu {
 
         for ($i = $startIdx; $i -le $endIdx; $i++) {
             & $RenderItem $Items[$i] $i
-            # 同頁項目之間固定保留乾淨空行（最後一項不空行）
-            if ($i -lt $endIdx) {
+            if (-not $Compact -and $i -lt $endIdx) {
                 Write-Host ""
             }
         }

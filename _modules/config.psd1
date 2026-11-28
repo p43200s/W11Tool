@@ -1,7 +1,7 @@
 ﻿@{
     # 專案標題與預設版本
     AppName    = "Windows 11 裝機工具箱"
-    DefaultVer = "0.3.2"
+    DefaultVer = "0.3.3"
 
     # 線上工具庫 (Type 支援: irm_iex / web)
     OnlineTools = @(
@@ -27,22 +27,29 @@
 
     # 常用工具軟體清單
     SoftwareList = @(
-        @{ Cat = "遊戲"; Name = "Steam";                        Id = "Valve.Steam";                            Src = "winget" }
-        @{ Cat = "工具"; Name = "Firefox";                      Id = "Mozilla.Firefox";                        Src = "winget" }
-        @{ Cat = "工具"; Name = "7-Zip";                        Id = "7zip.7zip";                              Src = "winget" }
-        @{ Cat = "工具"; Name = "Wintoys";                      Id = "9P8LTPGCBZXD";                           Src = "msstore" }
-        @{ Cat = "Google"; Name = "Chrome";                     Id = "Google.Chrome";                          Src = "winget" }
-        @{ Cat = "Google"; Name = "Google Drive";               Id = "Google.GoogleDrive";                     Src = "winget" }
-        @{ Cat = "Google"; Name = "Chrome Remote Desktop";      Id = "Google.ChromeRemoteDesktopHost";         Src = "winget" }
-        @{ Cat = "編輯"; Name = "Notepad++";                    Id = "Notepad++.Notepad++";                    Src = "winget" }
-        @{ Cat = "編輯"; Name = "Obsidian";                     Id = "Obsidian.Obsidian";                      Src = "winget" }
-        @{ Cat = "編輯"; Name = "Stirling PDF";                 Id = "StirlingTools.StirlingPDF";              Src = "winget" }
-        @{ Cat = "媒體"; Name = "VLC";                          Id = "VideoLAN.VLC";                           Src = "winget" }
-        @{ Cat = "媒體"; Name = "XnView MP";                    Id = "XnSoft.XnViewMP";                        Src = "winget" }
-        @{ Cat = "驅動"; Name = "Logitech G HUB";               Id = "Logitech.GHUB";                          Src = "winget" }
-        @{ Cat = "驅動"; Name = "Logitech Options+";            Id = "Logitech.OptionsPlus";                   Src = "winget" }
-        @{ Cat = "驅動"; Name = "MSI Center";                   Id = "9NVMNJCR03XV";                           Src = "msstore" }
-        @{ Cat = "驅動"; Name = "Razer Central";                Id = "Razer.RazerCentral";                       Src = "winget" }
+        @{ Cat = "工具"; Name = "7-Zip";                        Id = "7zip.7zip";                               Src = "winget" }
+        @{ Cat = "工具"; Name = "Wintoys";                      Id = "9P8LTPGCBZXD";                            Src = "msstore" }
+        @{ Cat = "工具"; Name = "Microsoft PowerToys";          Id = "Microsoft.PowerToys";                     Src = "winget" }
+        @{ Cat = "Google"; Name = "Chrome";                     Id = "Google.Chrome";                           Src = "winget" }
+        @{ Cat = "Google"; Name = "Google Drive";               Id = "Google.GoogleDrive";                      Src = "winget" }
+        @{ Cat = "Google"; Name = "Chrome Remote Desktop";      Id = "Google.ChromeRemoteDesktopHost";          Src = "winget" }
+        @{ Cat = "網路"; Name = "Firefox";                      Id = "Mozilla.Firefox";                         Src = "winget" }
+        @{ Cat = "網路"; Name = "AnyDesk";                      Id = "AnyDesk.AnyDesk";                         Src = "winget" }
+        @{ Cat = "網路"; Name = "qBittorrent";                  Id = "qBittorrent.qBittorrent";                 Src = "winget" }
+        @{ Cat = "通訊"; Name = "LINE";                         Id = "LINE.LINE";                               Src = "winget" }
+        @{ Cat = "通訊"; Name = "Discord";                      Id = "Discord.Discord";                         Src = "winget" }
+        @{ Cat = "遊戲"; Name = "Steam";                        Id = "Valve.Steam";                             Src = "winget" }
+        @{ Cat = "編輯"; Name = "Notepad++";                    Id = "Notepad++.Notepad++";                     Src = "winget" }
+        @{ Cat = "編輯"; Name = "Obsidian";                     Id = "Obsidian.Obsidian";                       Src = "winget" }
+        @{ Cat = "編輯"; Name = "Stirling PDF";                 Id = "StirlingTools.StirlingPDF";               Src = "winget" }
+        @{ Cat = "媒體"; Name = "VLC";                          Id = "VideoLAN.VLC";                            Src = "winget" }
+        @{ Cat = "媒體"; Name = "PotPlayer";                    Id = "Daum.PotPlayer";                          Src = "winget" }
+        @{ Cat = "媒體"; Name = "K-Lite Codec Pack Standard";   Id = "CodecGuide.K-LiteCodecPack.Standard";     Src = "winget" }
+        @{ Cat = "媒體"; Name = "XnView MP";                    Id = "XnSoft.XnViewMP";                         Src = "winget" }
+        @{ Cat = "驅動"; Name = "Logitech G HUB";               Id = "Logitech.GHUB";                           Src = "winget" }
+        @{ Cat = "驅動"; Name = "Logitech Options+";            Id = "Logitech.OptionsPlus";                    Src = "winget" }
+        @{ Cat = "驅動"; Name = "MSI Center";                   Id = "9NVMNJCR03XV";                            Src = "msstore" }
+        @{ Cat = "驅動"; Name = "Razer Central";                Id = "Razer.RazerCentral";                      Src = "winget" }
         @{ Cat = "驅動"; Name = "Display Driver Uninstaller";   Id = "Wagnardsoft.DisplayDriverUninstaller";    Src = "winget" }
         @{ Cat = "驅動"; Name = "NVCleanstall";                 Id = "TechPowerUp.NVCleanstall";                Src = "winget" }
         @{ Cat = "監控"; Name = "CPU-Z";                        Id = "CPUID.CPU-Z";                             Src = "winget" }
@@ -55,30 +62,17 @@
         @{ Cat = "美工"; Name = "Inkscape";                     Id = "Inkscape.Inkscape";                       Src = "winget" }
         @{ Cat = "美工"; Name = "Paint.NET";                    Id = "dotPDN.PaintDotNet";                      Src = "winget" }
         @{ Cat = "美工"; Name = "Blender";                      Id = "BlenderFoundation.Blender";               Src = "winget" }
-        @{ Cat = "內建"; Name = "Microsoft 小畫家";             Id = "9PCFS5B6T720";                            Src = "msstore" }
-        @{ Cat = "內建"; Name = "Windows 小算盤";               Id = "9WZDNCRFHVN5";                            Src = "msstore" }
-        @{ Cat = "內建"; Name = "Microsoft 相片";               Id = "9FZBMKLG03D3";                            Src = "msstore" }
-        @{ Cat = "內建"; Name = "剪取工具";                     Id = "9MZ95KL8MR0L";                            Src = "msstore" }
-        @{ Cat = "內建"; Name = "Windows 終端機";               Id = "9NBLGGH4MS6B";                            Src = "msstore" }
-    )
-
-    # 軟體快捷組合 (對應 SoftwareList 的套件 ID)
-    SoftwarePresets = @(
-        @{
-            Key  = "P1"
-            Name = "基礎裝機包 (7-Zip, Chrome, Notepad++, VLC, XnView)"
-            Ids  = @("7zip.7zip", "Google.Chrome", "Notepad++.Notepad++", "VideoLAN.VLC", "XnSoft.XnViewMP")
-        }
-        @{
-            Key  = "P2"
-            Name = "硬體檢測包 (CPU-Z, GPU-Z, CrystalDiskInfo, HWiNFO)"
-            Ids  = @("CPUID.CPU-Z", "TechPowerUp.GPU-Z", "CrystalMarkSOFTWARE.CrystalDiskInfo", "REALiX.HWiNFO")
-        }
-        @{
-            Key  = "P3"
-            Name = "內建工具全補齊 (小畫家, 小算盤, 相片, 剪取工具, 終端機)"
-            Ids  = @("9PCFS5B6T720", "9WZDNCRFHVN5", "9FZBMKLG03D3", "9MZ95KL8MR0L", "9NBLGGH4MS6B")
-        }
+        @{ Cat = "元件"; Name = "Java Runtime Environment";     Id = "Oracle.JavaRuntimeEnvironment";           Src = "winget" }
+        @{ Cat = "元件"; Name = "VC++ 2015-2022 (x64)";          Id = "Microsoft.VCRedist.2015+.x64";           Src = "winget" }
+        @{ Cat = "元件"; Name = "VC++ 2015-2022 (x86)";          Id = "Microsoft.VCRedist.2015+.x86";           Src = "winget" }
+        @{ Cat = "元件"; Name = ".NET 8 Desktop Runtime";        Id = "Microsoft.DotNet.DesktopRuntime.8";      Src = "winget" }
+        @{ Cat = "元件"; Name = ".NET 9 Desktop Runtime";        Id = "Microsoft.DotNet.DesktopRuntime.9";      Src = "winget" }
+        @{ Cat = "元件"; Name = ".NET 10 Desktop Runtime";       Id = "Microsoft.DotNet.DesktopRuntime.10";     Src = "winget" }
+        @{ Cat = "內建"; Name = "Microsoft 小畫家";             Id = "9PCFS5B6T720";                             Src = "msstore" }
+        @{ Cat = "內建"; Name = "Windows 小算盤";               Id = "9WZDNCRFHVN5";                             Src = "msstore" }
+        @{ Cat = "內建"; Name = "Microsoft 相片";               Id = "9FZBMKLG03D3";                             Src = "msstore" }
+        @{ Cat = "內建"; Name = "剪取工具";                     Id = "9MZ95KL8MR0L";                             Src = "msstore" }
+        @{ Cat = "內建"; Name = "Windows 終端機";               Id = "9NBLGGH4MS6B";                             Src = "msstore" }
     )
 
     # KMS 伺服器清單

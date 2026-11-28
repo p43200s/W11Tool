@@ -8,7 +8,7 @@ $safeAppName = ($configData.AppName -replace '[\\/:*?"<>|\s]+', '').Trim()
 if ([string]::IsNullOrWhiteSpace($safeAppName)) { $safeAppName = "W11Tool" }
 $verTag = ($configData.DefaultVer -replace '^v', '').Trim()
 
-$outputFile = "${safeAppName}_${verTag}_code_dump.txt"
+$outputFile = "W11Tool_${verTag}.txt"
 $outputPath = Join-Path $RootDir $outputFile
 
 $tee  = "$([char]0x251C)$([char]0x2500)$([char]0x2500) "
