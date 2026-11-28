@@ -14,12 +14,6 @@
         return
     }
 
-    $confirm = (Read-Host "確定要從網路即時載入並執行此腳本嗎？(Y/n)").Trim()
-    if ($confirm -ne "" -and $confirm -ine "Y") {
-        Write-Status -Level "WARN" -Message "已取消執行。"
-        return
-    }
-
     Write-Host ""
     Write-Status -Level "STEP" -Message "正在連線取得腳本..."
     $scriptContent = Invoke-RestMethod -Uri $Tool.Url -TimeoutSec 20 -ErrorAction Stop
@@ -39,7 +33,7 @@ function Show-OnlineToolsMenu {
         return
     }
 
-    Invoke-PagedMenu -Subtitle "線上工具庫 (即時拉取執行)" -Items $list -PageSize 6 `
+    Invoke-PagedMenu -Subtitle "線上工具庫" -Items $list -PageSize 6 `
         -RenderItem {
             param($t, $idx)
             Write-Host (" [{0,2}] {1}" -f ($idx + 1), $t.Name) -ForegroundColor White

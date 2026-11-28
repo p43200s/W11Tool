@@ -1,5 +1,19 @@
 # 更新日誌
 
+## [0.3.2] - 2026-11-28
+
+### 新增
+
+- **自動版本更新檢查模組 (_modules/updater.ps1)**：新增 Invoke-SelfUpdateCheck 函式，透過 p43200s/W11Tool GitHub Releases API 比對目前版本與最新版本，發現新版本時詢問是否下載、顯示儲存路徑，並提醒使用者關閉目前版本改用新版。
+- **啟動自動更新檢查整合 (_modules/menu.ps1)**：在載入模組完成後、進入主選單迴圈前自動執行 Invoke-SelfUpdateCheck -RootDir $RootDir -SilentIfLatest。   
+- **開源美工軟體設定擴充 (_modules/config.psd1)**：支援於 SoftwareList 與 GitHubList 新增 GIMP 等開源免費美工/影像工具設定項目。   
+
+
+### 調整
+
+- **線上工具即時執行流程 (_modules/online.ps1)**：移除 Invoke-OnlineToolItem 中執行腳本前的二次確認提示，選取項目後直接下載並執行。
+
+
 ## [0.3.1] - 2026-11-23
 
 ### 新增

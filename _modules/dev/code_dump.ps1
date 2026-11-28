@@ -1,7 +1,14 @@
 ﻿param([string]$RootDir)
 $ErrorActionPreference = "Stop"
 
-$outputFile = "code_dump.txt"
+$configPath = Join-Path $RootDir "_modules\config.psd1"
+$configData = Import-PowerShellDataFile -Path $configPath
+
+$safeAppName = ($configData.AppName -replace '[\\/:*?"<>|\s]+', '').Trim()
+if ([string]::IsNullOrWhiteSpace($safeAppName)) { $safeAppName = "W11Tool" }
+$verTag = ($configData.DefaultVer -replace '^v', '').Trim()
+
+$outputFile = "${safeAppName}_${verTag}_code_dump.txt"
 $outputPath = Join-Path $RootDir $outputFile
 
 $tee  = "$([char]0x251C)$([char]0x2500)$([char]0x2500) "
@@ -10,7 +17,7 @@ $pipe = "$([char]0x2502)   "
 
 $targetFiles = Get-ChildItem -Path $RootDir -Recurse -File -Include *.bat,*.ps1,*.psm1,*.psd1,*.md |
 Where-Object {
-    if ($_.Name -eq $outputFile) { return $false }
+    if ($_.Name -imatch '_code_dump\.txt$' -or $_.Name -eq "code_dump.txt") { return $false }
     if ($_.Name -imatch '^W11Tool_.*\.bat$') { return $false }
     if ($_.Extension -ieq '.bat') {
         $firstLine = Get-Content -LiteralPath $_.FullName -TotalCount 1 -Encoding UTF8 -ErrorAction SilentlyContinue

@@ -1,7 +1,7 @@
 ﻿@{
     # 專案標題與預設版本
     AppName    = "Windows 11 裝機工具箱"
-    DefaultVer = "0.3.1"
+    DefaultVer = "0.3.2"
 
     # 線上工具庫 (Type 支援: irm_iex / web)
     OnlineTools = @(
@@ -25,36 +25,41 @@
         }
     )
 
-    # 常用工具軟體清單 (自動依順序生成編號)
+    # 常用工具軟體清單
     SoftwareList = @(
-        @{ Cat = "遊戲"; Name = "Steam";                      Id = "Valve.Steam";                       Src = "winget" }
-        @{ Cat = "工具"; Name = "Firefox";                    Id = "Mozilla.Firefox";                   Src = "winget" }
-        @{ Cat = "工具"; Name = "7-Zip";                      Id = "7zip.7zip";                         Src = "winget" }
-        @{ Cat = "工具"; Name = "Wintoys";                    Id = "9P8LTPGCBZXD";                      Src = "msstore" }
-        @{ Cat = "Google"; Name = "Chrome";                   Id = "Google.Chrome";                     Src = "winget" }
-        @{ Cat = "Google"; Name = "Google Drive";             Id = "Google.GoogleDrive";                Src = "winget" }
-        @{ Cat = "Google"; Name = "Chrome Remote Desktop";    Id = "Google.ChromeRemoteDesktopHost";    Src = "winget" }
-        @{ Cat = "編輯"; Name = "Notepad++";                  Id = "Notepad++.Notepad++";               Src = "winget" }
-        @{ Cat = "編輯"; Name = "Obsidian";                   Id = "Obsidian.Obsidian";                 Src = "winget" }
-        @{ Cat = "編輯"; Name = "Stirling PDF";               Id = "StirlingTools.StirlingPDF";         Src = "winget" }
-        @{ Cat = "媒體"; Name = "VLC";                        Id = "VideoLAN.VLC";                      Src = "winget" }
-        @{ Cat = "媒體"; Name = "XnView MP";                  Id = "XnSoft.XnViewMP";                   Src = "winget" }
-        @{ Cat = "驅動"; Name = "Logitech G HUB";             Id = "Logitech.GHUB";                     Src = "winget" }
-        @{ Cat = "驅動"; Name = "Logitech Options+";          Id = "Logitech.OptionsPlus";              Src = "winget" }
-        @{ Cat = "驅動"; Name = "MSI Center";                 Id = "9NVMNJCR03XV";                      Src = "msstore" }
-        @{ Cat = "驅動"; Name = "Razer Central";              Id = "Razer.RazerCentral";                Src = "winget" }
-        @{ Cat = "驅動"; Name = "Display Driver Uninstaller"; Id = "Wagnardsoft.DisplayDriverUninstaller"; Src = "winget" }
-        @{ Cat = "驅動"; Name = "NVCleanstall";               Id = "TechPowerUp.NVCleanstall";          Src = "winget" }
-        @{ Cat = "監控"; Name = "CPU-Z";                      Id = "CPUID.CPU-Z";                       Src = "winget" }
-        @{ Cat = "監控"; Name = "GPU-Z";                      Id = "TechPowerUp.GPU-Z";                 Src = "winget" }
-        @{ Cat = "監控"; Name = "HWMonitor";                  Id = "CPUID.HWMonitor";                   Src = "winget" }
-        @{ Cat = "監控"; Name = "CrystalDiskInfo";            Id = "CrystalMarkSOFTWARE.CrystalDiskInfo"; Src = "winget" }
-        @{ Cat = "監控"; Name = "HWiNFO";                     Id = "REALiX.HWiNFO";                     Src = "winget" }
-        @{ Cat = "內建"; Name = "Microsoft 小畫家";           Id = "9PCFS5B6T720";                      Src = "msstore" }
-        @{ Cat = "內建"; Name = "Windows 小算盤";             Id = "9WZDNCRFHVN5";                      Src = "msstore" }
-        @{ Cat = "內建"; Name = "Microsoft 相片";             Id = "9FZBMKLG03D3";                      Src = "msstore" }
-        @{ Cat = "內建"; Name = "剪取工具";                   Id = "9MZ95KL8MR0L";                      Src = "msstore" }
-        @{ Cat = "內建"; Name = "Windows 終端機";             Id = "9NBLGGH4MS6B";                      Src = "msstore" }
+        @{ Cat = "遊戲"; Name = "Steam";                        Id = "Valve.Steam";                            Src = "winget" }
+        @{ Cat = "工具"; Name = "Firefox";                      Id = "Mozilla.Firefox";                        Src = "winget" }
+        @{ Cat = "工具"; Name = "7-Zip";                        Id = "7zip.7zip";                              Src = "winget" }
+        @{ Cat = "工具"; Name = "Wintoys";                      Id = "9P8LTPGCBZXD";                           Src = "msstore" }
+        @{ Cat = "Google"; Name = "Chrome";                     Id = "Google.Chrome";                          Src = "winget" }
+        @{ Cat = "Google"; Name = "Google Drive";               Id = "Google.GoogleDrive";                     Src = "winget" }
+        @{ Cat = "Google"; Name = "Chrome Remote Desktop";      Id = "Google.ChromeRemoteDesktopHost";         Src = "winget" }
+        @{ Cat = "編輯"; Name = "Notepad++";                    Id = "Notepad++.Notepad++";                    Src = "winget" }
+        @{ Cat = "編輯"; Name = "Obsidian";                     Id = "Obsidian.Obsidian";                      Src = "winget" }
+        @{ Cat = "編輯"; Name = "Stirling PDF";                 Id = "StirlingTools.StirlingPDF";              Src = "winget" }
+        @{ Cat = "媒體"; Name = "VLC";                          Id = "VideoLAN.VLC";                           Src = "winget" }
+        @{ Cat = "媒體"; Name = "XnView MP";                    Id = "XnSoft.XnViewMP";                        Src = "winget" }
+        @{ Cat = "驅動"; Name = "Logitech G HUB";               Id = "Logitech.GHUB";                          Src = "winget" }
+        @{ Cat = "驅動"; Name = "Logitech Options+";            Id = "Logitech.OptionsPlus";                   Src = "winget" }
+        @{ Cat = "驅動"; Name = "MSI Center";                   Id = "9NVMNJCR03XV";                           Src = "msstore" }
+        @{ Cat = "驅動"; Name = "Razer Central";                Id = "Razer.RazerCentral";                       Src = "winget" }
+        @{ Cat = "驅動"; Name = "Display Driver Uninstaller";   Id = "Wagnardsoft.DisplayDriverUninstaller";    Src = "winget" }
+        @{ Cat = "驅動"; Name = "NVCleanstall";                 Id = "TechPowerUp.NVCleanstall";                Src = "winget" }
+        @{ Cat = "監控"; Name = "CPU-Z";                        Id = "CPUID.CPU-Z";                             Src = "winget" }
+        @{ Cat = "監控"; Name = "GPU-Z";                        Id = "TechPowerUp.GPU-Z";                       Src = "winget" }
+        @{ Cat = "監控"; Name = "HWMonitor";                    Id = "CPUID.HWMonitor";                         Src = "winget" }
+        @{ Cat = "監控"; Name = "CrystalDiskInfo";              Id = "CrystalMarkSOFTWARE.CrystalDiskInfo";     Src = "winget" }
+        @{ Cat = "監控"; Name = "HWiNFO";                       Id = "REALiX.HWiNFO";                           Src = "winget" }
+        @{ Cat = "美工"; Name = "GIMP";                         Id = "GIMP.GIMP.3";                             Src = "winget" }
+        @{ Cat = "美工"; Name = "Krita";                        Id = "KDE.Krita";                               Src = "winget" }
+        @{ Cat = "美工"; Name = "Inkscape";                     Id = "Inkscape.Inkscape";                       Src = "winget" }
+        @{ Cat = "美工"; Name = "Paint.NET";                    Id = "dotPDN.PaintDotNet";                      Src = "winget" }
+        @{ Cat = "美工"; Name = "Blender";                      Id = "BlenderFoundation.Blender";               Src = "winget" }
+        @{ Cat = "內建"; Name = "Microsoft 小畫家";             Id = "9PCFS5B6T720";                            Src = "msstore" }
+        @{ Cat = "內建"; Name = "Windows 小算盤";               Id = "9WZDNCRFHVN5";                            Src = "msstore" }
+        @{ Cat = "內建"; Name = "Microsoft 相片";               Id = "9FZBMKLG03D3";                            Src = "msstore" }
+        @{ Cat = "內建"; Name = "剪取工具";                     Id = "9MZ95KL8MR0L";                            Src = "msstore" }
+        @{ Cat = "內建"; Name = "Windows 終端機";               Id = "9NBLGGH4MS6B";                            Src = "msstore" }
     )
 
     # 軟體快捷組合 (對應 SoftwareList 的套件 ID)
@@ -143,6 +148,13 @@
             Tag     = ""
             Pattern = "Magpie-v*-x64.zip"
             Desc    = "視窗化遊戲與軟體通用無損縮放/補幀放大工具"
+        }
+        @{
+            Name    = "ImageGlass"
+            Repo    = "d2phap/ImageGlass"
+            Tag     = ""
+            Pattern = "*win*x64*.zip"
+            Desc    = "輕量開源的圖片檢視器（支援多種影像格式）"
         }
     )
 }

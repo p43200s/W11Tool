@@ -12,6 +12,8 @@ Get-ChildItem -Path $PSScriptRoot -Filter "*.ps1" | Where-Object { $_.Name -ne "
     . $_.FullName
 }
 
+Invoke-SelfUpdateCheck -RootDir $RootDir -SilentIfLatest
+
 while ($true) {
     $cfg = Get-WinToolConfig -RootDir $RootDir
     $ver = Get-AppVersion -RootDir $RootDir

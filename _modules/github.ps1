@@ -60,7 +60,17 @@ function Get-GitHubReleaseInfo {
     try {
         return Invoke-RestMethod -Uri $apiUrl -Headers $headers -TimeoutSec 15 -ErrorAction Stop
     } catch {
-        $statusCode = $_.Exception.Response.StatusCode.value__
+        $statusCode = $null
+        if ($_.Exception.PSObject.Properties.Match('Response').Count -gt 0 -and $_.Exception.Response) {
+            try {
+                $statusCode = [int]$_.Exception.Response.StatusCode
+            } catch {
+                try {
+                    $statusCode = [int]$_.Exception.Response.StatusCode.value__
+                } catch {}
+            }
+        }
+
         if ($statusCode -eq 403) {
             throw "GitHub API 請求次數已達上限 (Rate Limit)，請稍後再試。"
         } elseif ($statusCode -eq 404) {

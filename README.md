@@ -58,6 +58,7 @@ W11Tool/
 │   ├── software.ps1          # WinGet 軟體雙欄選單安裝與全機更新模組
 │   ├── system.ps1            # 系統登錄檔調校、電源計畫、Game Bar 移除與 Defender 控制
 │   ├── ui.psm1               # 終端機 TUI 繪製引擎（CJK 寬度對齊、雙欄網格、方向鍵分頁選單）
+│   ├── updater.ps1           # GitHub Releases API 版本更新腳本
 │   └── utils.psm1            # 核心工具函式（硬體資訊快取、網路檢測、WinGet 修復、多選解析）
 └── start.bat                 # 開發模式啟動入口（自動 UTF-8 編碼與 UAC 提權）
 ```
